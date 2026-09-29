@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "deskview",
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
@@ -8,7 +8,6 @@
     "expo": "~57.0.25",
     "expo-clipboard": "~57.0.2",
     "expo-haptics": "~57.0.3",
-    "expo-media-library": "~57.0.5",
     "expo-screen-orientation": "~57.0.2",
     "expo-sharing": "~57.0.22",
     "expo-status-bar": "~57.0.1",
@@ -31,7 +30,12 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "build:snack": "node scripts/build-snack.mjs",
+    "check:snack": "node scripts/build-snack.mjs --check",
+    "export:ios": "expo export --platform ios --output-dir dist"
   },
   "private": true
 }

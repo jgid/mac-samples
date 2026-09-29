@@ -1,6 +1,15 @@
-// STUB – implemented by work package A.
+// Builders for the JavaScript injected into the WebView (work package A).
 // All builders return plain JavaScript source strings for react-native-webview.
 import type { AgentProfile, Resolution } from '../../types';
+import { buildDesktopEnvScript } from './desktopEnv';
+import { buildInfoReporterScript } from './infoReporter';
+import { buildMouseEngineScript } from './mouseEngine';
+import { jsInt, jsNum } from './shared';
+import { buildViewportScript } from './viewport';
+
+export { HOVER_ATTR, HOVER_STYLE_ID } from './mouseEngine';
+export { MQ_FALSE, MQ_TRUE } from './shared';
+export { VIEWPORT_CONTENT } from './viewport';
 
 export interface InjectionOptions {
   /** Virtual screen size reported via screen.width/height (the CSS viewport size). */
@@ -17,17 +26,26 @@ export interface InjectionOptions {
  * Must be idempotent and end with `true;`.
  */
 export function buildBeforeContentScript(options: InjectionOptions): string {
-  throw new Error('not implemented');
+  const parts = [buildViewportScript()];
+  if (options.desktopMode) parts.push(buildDesktopEnvScript(options.screen, options.agent));
+  parts.push(buildMouseEngineScript(), buildInfoReporterScript());
+  return parts.join('') + 'true;';
 }
 
 /** Updates spoofed screen size of the current page without reload. Ends with `true;`. */
 export function buildScreenUpdateCall(screen: Resolution): string {
-  throw new Error('not implemented');
+  const w = jsInt(screen?.width, 1920);
+  const h = jsInt(screen?.height, 1080);
+  return `try{window.__dvSetScreen&&window.__dvSetScreen(${w},${h});window.__dvRequestInfo&&window.__dvRequestInfo();}catch(e){}true;`;
 }
 
 /** Asks the page to post a fresh 'info' message. Ends with `true;`. */
 export function buildInfoRequestCall(): string {
-  throw new Error('not implemented');
+  return 'try{window.__dvRequestInfo&&window.__dvRequestInfo();}catch(e){}true;';
+}
+
+function call(method: string, args: number[]): string {
+  return `try{window.__dv && window.__dv.${method}(${args.map(jsNum).join(',')});}catch(e){}true;`;
 }
 
 /**
@@ -44,18 +62,18 @@ export function buildInfoRequestCall(): string {
  */
 export const mouse = {
   move(x: number, y: number): string {
-    throw new Error('not implemented');
+    return call('move', [x, y]);
   },
   click(x: number, y: number): string {
-    throw new Error('not implemented');
+    return call('click', [x, y]);
   },
   contextMenu(x: number, y: number): string {
-    throw new Error('not implemented');
+    return call('contextMenu', [x, y]);
   },
   scroll(x: number, y: number, dx: number, dy: number): string {
-    throw new Error('not implemented');
+    return call('scroll', [x, y, dx, dy]);
   },
   leave(): string {
-    throw new Error('not implemented');
+    return call('leave', []);
   },
 };
