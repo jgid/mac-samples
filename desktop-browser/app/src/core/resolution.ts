@@ -6,19 +6,23 @@ export const MAX_WIDTH = 7680;
 export const MIN_HEIGHT = 240;
 export const MAX_HEIGHT = 4320;
 
+/** In 'fill' mode the virtual height may grow up to this multiple of the chosen height. */
+export const FILL_MAX_HEIGHT_FACTOR = 2;
+
 export const DEFAULT_RESOLUTION: Resolution = { width: 1920, height: 1080 };
 
 /** Device-named presets, ordered small → large. */
 export const PRESETS: Preset[] = [
   { id: 'laptop-small', label: 'Kleiner Laptop', detail: 'Ältere oder kompakte Notebooks', group: 'laptop', width: 1280, height: 800 },
   { id: 'laptop-hd', label: 'Laptop HD (Windows)', detail: 'Günstige Windows-Notebooks, sehr verbreitet', group: 'laptop', width: 1366, height: 768 },
+  { id: 'macbook-air-1440', label: 'MacBook Air 13″ (bis 2020)', detail: 'Ältere Mac-Laptops, sehr verbreitet', group: 'laptop', width: 1440, height: 900 },
   { id: 'macbook-air-13', label: 'MacBook Air 13″', detail: 'Typischer Mac-Laptop (Standard-Skalierung)', group: 'laptop', width: 1470, height: 956 },
   { id: 'macbook-pro-14', label: 'MacBook Pro 14″', detail: 'Mac-Laptop für Profis', group: 'laptop', width: 1512, height: 982 },
   { id: 'laptop-15-win', label: 'Laptop 15″ Windows 125 %', detail: 'Full-HD-Notebook mit 125 % Skalierung', group: 'laptop', width: 1536, height: 864 },
   { id: 'macbook-pro-16', label: 'MacBook Pro 16″', detail: 'Großer Mac-Laptop', group: 'laptop', width: 1728, height: 1117 },
   { id: 'monitor-fullhd', label: 'Full-HD-Monitor', detail: 'Häufigste Desktop-Auflösung', group: 'desktop', width: 1920, height: 1080 },
   { id: 'imac-24', label: 'iMac 24″', detail: 'All-in-one-Mac (Standard-Skalierung)', group: 'desktop', width: 2240, height: 1260 },
-  { id: 'monitor-wqhd', label: 'WQHD-Monitor', detail: '27″-Monitor bei 100 %', group: 'desktop', width: 2560, height: 1440 },
+  { id: 'imac-27', label: 'iMac 27″ / WQHD-Monitor', detail: 'Großer iMac oder 27″-Monitor bei 100 %', group: 'desktop', width: 2560, height: 1440 },
   { id: 'studio-display-more', label: 'Studio Display 27″ (mehr Platz)', detail: '5K-Display mit maximaler Arbeitsfläche', group: 'large', width: 3200, height: 1800 },
   { id: 'ultrawide', label: 'Ultrawide-Monitor', detail: '34″ im 21:9-Format', group: 'large', width: 3440, height: 1440 },
   { id: 'monitor-4k', label: '4K-Monitor (100 %)', detail: 'Riesige Arbeitsfläche ohne Skalierung', group: 'large', width: 3840, height: 2160 },
@@ -75,9 +79,12 @@ export function computeGeometry(
     };
   }
   const scale = cw / res.width;
+  // Cap the stretched height: a portrait phone would otherwise ask WebKit to render
+  // e.g. 1920 × 4000 CSS px, which costs a lot of memory for little benefit.
+  const maxHeight = res.height * FILL_MAX_HEIGHT_FACTOR;
   return {
     cssWidth: res.width,
-    cssHeight: Math.max(1, Math.round(ch / scale)),
+    cssHeight: Math.max(1, Math.min(maxHeight, Math.round(ch / scale))),
     scale,
     offsetX: 0,
     offsetY: 0,

@@ -172,6 +172,17 @@ export const DesktopViewport = forwardRef<DesktopViewportHandle, DesktopViewport
     lastSize.current = key;
   }, [cssWidth, cssHeight, inject]);
 
+  // WKWebView.reload() after loadHTMLString re-requests the baseUrl from the network (deskview.local
+  // does not exist), so the test page is "reloaded" by loading its HTML again with a fresh baseUrl.
+  const reloadPage = useCallback(() => {
+    if (nav.current.url === TEST_PAGE_URL) {
+      testNonce.current += 1;
+      setSource(testPageSource(testNonce.current));
+      return;
+    }
+    webRef.current?.reload();
+  }, []);
+
   // Agent / desktop mode change: needs a reload so the new UA and script apply from the start.
   // (iOS WKWebView does not reload by itself when customUserAgent changes.)
   const envKey = `${agent.id}|${agent.userAgent}|${desktopMode}`;
@@ -180,9 +191,9 @@ export const DesktopViewport = forwardRef<DesktopViewportHandle, DesktopViewport
     if (lastEnv.current === envKey) return;
     lastEnv.current = envKey;
     // Give the native side a moment to receive the new props before reloading.
-    const t = setTimeout(() => webRef.current?.reload(), 60);
+    const t = setTimeout(reloadPage, 60);
     return () => clearTimeout(t);
-  }, [envKey]);
+  }, [envKey, reloadPage]);
 
   // Leaving mouse mode: drop hover state in the page.
   const lastMode = useRef(inputMode);
@@ -201,15 +212,14 @@ export const DesktopViewport = forwardRef<DesktopViewportHandle, DesktopViewport
 
   const load = useCallback(
     (url: string) => {
-      const current = nav.current.url;
-      if (url === current) {
-        webRef.current?.reload();
-        return;
-      }
       if (url === TEST_PAGE_URL) {
         // Source may still be the test page while the WebView navigated elsewhere; vary baseUrl to force a load.
         testNonce.current += 1;
         setSource(testPageSource(testNonce.current));
+        return;
+      }
+      if (url === nav.current.url) {
+        webRef.current?.reload();
         return;
       }
       const prev = sourceRef.current;
@@ -229,7 +239,7 @@ export const DesktopViewport = forwardRef<DesktopViewportHandle, DesktopViewport
       load,
       goBack: () => webRef.current?.goBack(),
       goForward: () => webRef.current?.goForward(),
-      reload: () => webRef.current?.reload(),
+      reload: reloadPage,
       stop: () => {
         webRef.current?.stopLoading();
         emitNav({ loading: false });
@@ -257,7 +267,7 @@ export const DesktopViewport = forwardRef<DesktopViewportHandle, DesktopViewport
         }
       },
     }),
-    [load, emitNav, screenshotInfoBar],
+    [load, emitNav, reloadPage, screenshotInfoBar],
   );
 
   const handleShouldStart = useCallback(
@@ -349,7 +359,19 @@ export const DesktopViewport = forwardRef<DesktopViewportHandle, DesktopViewport
   }, []);
 
   // Recover from WebContent process crashes (memory pressure with very large viewports).
-  const handleTerminate = useCallback(() => webRef.current?.reload(), []);
+  // A second crash shortly after the first means the size is too large: stop instead of looping.
+  const lastTerminate = useRef(0);
+  const handleTerminate = useCallback(() => {
+    const now = Date.now();
+    const repeated = now - lastTerminate.current < 20000;
+    lastTerminate.current = now;
+    if (repeated) {
+      emitNav({ loading: false });
+      cb.current.onError?.('Die Seite ist abgestürzt (zu wenig Arbeitsspeicher). Wähle eine kleinere Bildschirmgröße.');
+      return;
+    }
+    reloadPage();
+  }, [emitNav, reloadPage]);
 
   const screenHeight = cssHeight + (infoMeta ? INFO_BAR_HEIGHT : 0);
 

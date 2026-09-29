@@ -58,12 +58,15 @@ describe('clampResolution', () => {
 describe('computeGeometry', () => {
   const r = { width: 1920, height: 1080 };
   it('fill: width fixed, height follows container', () => {
-    const g = computeGeometry(390, 700, r, 'fill');
-    expect(g.scale).toBeCloseTo(390 / 1920);
+    const g = computeGeometry(844, 700, r, 'fill');
+    expect(g.scale).toBeCloseTo(844 / 1920);
     expect(g.cssWidth).toBe(1920);
-    expect(g.cssHeight).toBe(Math.round(700 / (390 / 1920)));
+    expect(g.cssHeight).toBe(Math.round(700 / (844 / 1920)));
     expect(g.offsetX).toBe(0);
     expect(g.offsetY).toBe(0);
+  });
+  it('fill: stretched height is capped at twice the chosen height', () => {
+    expect(computeGeometry(390, 700, r, 'fill').cssHeight).toBe(2160);
   });
   it('exact: letterboxed and centered', () => {
     const g = computeGeometry(390, 700, r, 'exact');

@@ -112,7 +112,7 @@ const BODY = `
 
     <section class="card">
       <h2>Hover testen</h2>
-      <p class="sub">Schalte den Trackpad-Modus ein und bewege den Cursor über das Menü.</p>
+      <p class="sub">Tippe unten auf „Maus“ und bewege den Zeiger über das Menü.</p>
       <nav class="menu">
         <div class="menu-btn">☰ Fahre mit der Maus hierüber ▾</div>
         <div class="menu-list">
@@ -192,7 +192,7 @@ const SCRIPT = `
     }
     $('checks').innerHTML = html;
     $('summary').textContent = ok + ' von ' + checks.length + ' Merkmalen wirken wie ein Desktop-Browser' +
-      (ok === checks.length ? ' ✓' : ' – „Desktop-Modus“ in den Einstellungen hilft.');
+      (ok === checks.length ? ' ✓' : ' – „Desktop-Modus“ unter „Mehr“ einschalten.');
   }
   var logLines = [];
   function log(t) {

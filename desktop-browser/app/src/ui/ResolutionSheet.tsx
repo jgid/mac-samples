@@ -23,7 +23,7 @@ const MEMORY_HINT = 'Braucht viel Arbeitsspeicher';
 const SCALE_MODE_TEXT: Record<ScaleMode, { label: string; explain: string }> = {
   fill: {
     label: 'Ganzer Bildschirm',
-    explain: 'Breite wie gewählt, die Höhe passt sich deinem iPhone an – ohne Ränder.',
+    explain: 'Breite wie gewählt, die Höhe passt sich deinem iPhone an – ohne Ränder. Screenshots sind dann höher als der echte Monitor; für exakte Belege „Originalformat“ wählen.',
   },
   exact: {
     label: 'Originalformat',
@@ -132,7 +132,10 @@ export function ResolutionSheet({
                   title={p.label}
                   subtitle={`${formatResolution(p)}  ·  ${p.detail}${big ? `\n${MEMORY_HINT}` : ''}`}
                   checked={selected}
-                  onPress={() => selectPreset(p)}
+                  onPress={() => {
+                    selectPreset(p);
+                    onClose();
+                  }}
                   accessibilityLabel={`${p.label}, ${p.width} mal ${p.height} Pixel, ${p.detail}${big ? `, ${MEMORY_HINT}` : ''}`}
                 />
               </View>

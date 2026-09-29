@@ -18,12 +18,12 @@ kostenlose App **Expo Go** geladen.
    (kostenlos, kein Konto nötig).
 2. **Snack-Link auf dem iPhone in Safari öffnen:**
 
-   **→ [Deskview in Expo Snack öffnen](https://snack.expo.dev/?platform=ios&supportedPlatforms=ios&name=Deskview&description=Websites+wie+auf+einem+echten+Monitor+ansehen+und+mit+Maus-Cursor+bedienen&sdkVersion=57.0.0&dependencies=%40expo%2Fvector-icons%40%5E15.1.1%2C%40react-native-async-storage%2Fasync-storage%40%5E2.2.0%2Cexpo-clipboard%40%7E57.0.2%2Cexpo-haptics%40%7E57.0.3%2Cexpo-media-library%40%7E57.0.5%2Cexpo-screen-orientation%40%7E57.0.2%2Cexpo-sharing%40%7E57.0.22%2Cexpo-status-bar%40%7E57.0.1%2Creact-native-safe-area-context%40%7E5.7.0%2Creact-native-view-shot%40%5E5.1.0%2Creact-native-webview%40%5E13.16.1&sourceUrl=https%3A%2F%2Fraw.githubusercontent.com%2Fjgid%2Fmac-samples%2Fclaude%2Fdesktop-browser-app%2Fdesktop-browser%2Fsnack%2FApp.js)**
+   **→ [Deskview in Expo Snack öffnen](https://snack.expo.dev/?platform=ios&supportedPlatforms=ios&name=Deskview&description=Websites+wie+auf+einem+echten+Monitor+ansehen+und+mit+Maus-Cursor+bedienen&dependencies=%40expo%2Fvector-icons%4015.1.1%2C%40react-native-async-storage%2Fasync-storage%402.2.0%2Cexpo-clipboard%4057.0.2%2Cexpo-haptics%4057.0.3%2Cexpo-screen-orientation%4057.0.2%2Cexpo-sharing%4057.0.22%2Cexpo-status-bar%4057.0.1%2Creact-native-safe-area-context%405.7.0%2Creact-native-view-shot%405.1.0%2Creact-native-webview%4013.16.1&sourceUrl=https%3A%2F%2Fraw.githubusercontent.com%2Fjgid%2Fmac-samples%2Fclaude%2Fdesktop-browser-app%2Fdesktop-browser%2Fsnack%2FApp.js)**
 
    <details><summary>Link als Text (zum Kopieren)</summary>
 
    ```
-   https://snack.expo.dev/?platform=ios&supportedPlatforms=ios&name=Deskview&description=Websites+wie+auf+einem+echten+Monitor+ansehen+und+mit+Maus-Cursor+bedienen&sdkVersion=57.0.0&dependencies=%40expo%2Fvector-icons%40%5E15.1.1%2C%40react-native-async-storage%2Fasync-storage%40%5E2.2.0%2Cexpo-clipboard%40%7E57.0.2%2Cexpo-haptics%40%7E57.0.3%2Cexpo-media-library%40%7E57.0.5%2Cexpo-screen-orientation%40%7E57.0.2%2Cexpo-sharing%40%7E57.0.22%2Cexpo-status-bar%40%7E57.0.1%2Creact-native-safe-area-context%40%7E5.7.0%2Creact-native-view-shot%40%5E5.1.0%2Creact-native-webview%40%5E13.16.1&sourceUrl=https%3A%2F%2Fraw.githubusercontent.com%2Fjgid%2Fmac-samples%2Fclaude%2Fdesktop-browser-app%2Fdesktop-browser%2Fsnack%2FApp.js
+   https://snack.expo.dev/?platform=ios&supportedPlatforms=ios&name=Deskview&description=Websites+wie+auf+einem+echten+Monitor+ansehen+und+mit+Maus-Cursor+bedienen&dependencies=%40expo%2Fvector-icons%4015.1.1%2C%40react-native-async-storage%2Fasync-storage%402.2.0%2Cexpo-clipboard%4057.0.2%2Cexpo-haptics%4057.0.3%2Cexpo-screen-orientation%4057.0.2%2Cexpo-sharing%4057.0.22%2Cexpo-status-bar%4057.0.1%2Creact-native-safe-area-context%405.7.0%2Creact-native-view-shot%405.1.0%2Creact-native-webview%4013.16.1&sourceUrl=https%3A%2F%2Fraw.githubusercontent.com%2Fjgid%2Fmac-samples%2Fclaude%2Fdesktop-browser-app%2Fdesktop-browser%2Fsnack%2FApp.js
    ```
    </details>
 
@@ -38,7 +38,7 @@ kostenlose App **Expo Go** geladen.
 - Fragt die Snack-Seite nach einer Plattform, **iOS** wählen.
 - Meldet Expo Go einen **SDK-Konflikt** („incompatible SDK version“): Expo Go im App Store
   aktualisieren; oder auf der Snack-Seite im **SDK-Auswahlmenü** (unten in der Leiste) die
-  SDK-Version wählen, die Expo Go unterstützt (Deskview ist für **SDK 57** gebaut).
+  SDK-Version wählen, die Expo Go unterstützt (Deskview ist für **SDK 57** gebaut; der Link legt bewusst keine SDK-Version fest, damit Snack die zu Expo Go passende nimmt).
 - Fehlt ein Paket („Unable to resolve module …“): auf der Snack-Seite erscheint meist ein
   Hinweis „Add dependency“ – antippen, danach neu laden.
 - Snack zeigt immer den Stand des Branches `claude/desktop-browser-app`. Nach neuen Commits

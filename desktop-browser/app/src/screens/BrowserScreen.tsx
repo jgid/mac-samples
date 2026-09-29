@@ -220,15 +220,22 @@ export function BrowserScreen() {
     setIntroOpen(false);
     if (!settings.onboardingDone) updateSettings({ onboardingDone: true });
   }, [settings.onboardingDone, updateSettings]);
-  const showIntro = useCallback(() => setIntroOpen(true), []);
+  // Called while the settings sheet is closing: iOS cannot present a second modal until the first
+  // one is fully dismissed, so the intro would silently never appear.
+  const showIntro = useCallback(() => {
+    setTimeout(() => setIntroOpen(true), 600);
+  }, []);
 
   const closeSheet = useCallback(() => setSheet(null), []);
   const openResolution = useCallback(() => setSheet('resolution'), []);
   const openSettings = useCallback(() => setSheet('settings'), []);
   const openBookmarks = useCallback(() => setSheet('bookmarks'), []);
 
+  // In fill mode the height follows the phone, so only the width is meaningful.
   const sizeText = geometry
-    ? `${formatResolution({ width: geometry.cssWidth, height: geometry.cssHeight })} · ${formatScale(geometry.scale)}`
+    ? scaleMode === 'fill'
+      ? `${geometry.cssWidth} px breit · ${formatScale(geometry.scale)}`
+      : `${formatResolution({ width: geometry.cssWidth, height: geometry.cssHeight })} · ${formatScale(geometry.scale)}`
     : formatResolution(resolution);
 
   return (

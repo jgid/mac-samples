@@ -69,17 +69,19 @@ var MIN_WIDTH = 320;
 var MAX_WIDTH = 7680;
 var MIN_HEIGHT = 240;
 var MAX_HEIGHT = 4320;
+var FILL_MAX_HEIGHT_FACTOR = 2;
 var DEFAULT_RESOLUTION = { width: 1920, height: 1080 };
 var PRESETS = [
   { id: "laptop-small", label: "Kleiner Laptop", detail: "Ältere oder kompakte Notebooks", group: "laptop", width: 1280, height: 800 },
   { id: "laptop-hd", label: "Laptop HD (Windows)", detail: "Günstige Windows-Notebooks, sehr verbreitet", group: "laptop", width: 1366, height: 768 },
+  { id: "macbook-air-1440", label: "MacBook Air 13″ (bis 2020)", detail: "Ältere Mac-Laptops, sehr verbreitet", group: "laptop", width: 1440, height: 900 },
   { id: "macbook-air-13", label: "MacBook Air 13″", detail: "Typischer Mac-Laptop (Standard-Skalierung)", group: "laptop", width: 1470, height: 956 },
   { id: "macbook-pro-14", label: "MacBook Pro 14″", detail: "Mac-Laptop für Profis", group: "laptop", width: 1512, height: 982 },
   { id: "laptop-15-win", label: "Laptop 15″ Windows 125 %", detail: "Full-HD-Notebook mit 125 % Skalierung", group: "laptop", width: 1536, height: 864 },
   { id: "macbook-pro-16", label: "MacBook Pro 16″", detail: "Großer Mac-Laptop", group: "laptop", width: 1728, height: 1117 },
   { id: "monitor-fullhd", label: "Full-HD-Monitor", detail: "Häufigste Desktop-Auflösung", group: "desktop", width: 1920, height: 1080 },
   { id: "imac-24", label: "iMac 24″", detail: "All-in-one-Mac (Standard-Skalierung)", group: "desktop", width: 2240, height: 1260 },
-  { id: "monitor-wqhd", label: "WQHD-Monitor", detail: "27″-Monitor bei 100 %", group: "desktop", width: 2560, height: 1440 },
+  { id: "imac-27", label: "iMac 27″ / WQHD-Monitor", detail: "Großer iMac oder 27″-Monitor bei 100 %", group: "desktop", width: 2560, height: 1440 },
   { id: "studio-display-more", label: "Studio Display 27″ (mehr Platz)", detail: "5K-Display mit maximaler Arbeitsfläche", group: "large", width: 3200, height: 1800 },
   { id: "ultrawide", label: "Ultrawide-Monitor", detail: "34″ im 21:9-Format", group: "large", width: 3440, height: 1440 },
   { id: "monitor-4k", label: "4K-Monitor (100 %)", detail: "Riesige Arbeitsfläche ohne Skalierung", group: "large", width: 3840, height: 2160 }
@@ -120,9 +122,10 @@ function computeGeometry(containerWidth, containerHeight, r, mode) {
     };
   }
   const scale = cw / res.width;
+  const maxHeight = res.height * FILL_MAX_HEIGHT_FACTOR;
   return {
     cssWidth: res.width,
-    cssHeight: Math.max(1, Math.round(ch / scale)),
+    cssHeight: Math.max(1, Math.min(maxHeight, Math.round(ch / scale))),
     scale,
     offsetX: 0,
     offsetY: 0
@@ -1002,7 +1005,7 @@ var MEMORY_HINT = "Braucht viel Arbeitsspeicher";
 var SCALE_MODE_TEXT = {
   fill: {
     label: "Ganzer Bildschirm",
-    explain: "Breite wie gewählt, die Höhe passt sich deinem iPhone an – ohne Ränder."
+    explain: "Breite wie gewählt, die Höhe passt sich deinem iPhone an – ohne Ränder. Screenshots sind dann höher als der echte Monitor; für exakte Belege „Originalformat“ wählen."
   },
   exact: {
     label: "Originalformat",
@@ -1077,7 +1080,10 @@ function ResolutionSheet({
             subtitle: `${formatResolution(p)}  ·  ${p.detail}${big ? `
 ${MEMORY_HINT}` : ""}`,
             checked: selected,
-            onPress: () => selectPreset(p),
+            onPress: () => {
+              selectPreset(p);
+              onClose();
+            },
             accessibilityLabel: `${p.label}, ${p.width} mal ${p.height} Pixel, ${p.detail}${big ? `, ${MEMORY_HINT}` : ""}`
           }
         )
@@ -1678,7 +1684,7 @@ import { Pressable as Pressable11, StyleSheet as StyleSheet11, Text as Text11, V
 import { jsx as jsx12, jsxs as jsxs11 } from "react/jsx-runtime";
 var GESTURES = [
   { icon: "finger-print-outline", gesture: "1 Finger bewegen", effect: "Maus bewegen" },
-  { icon: "radio-button-on-outline", gesture: "Tippen", effect: "Klicken" },
+  { icon: "radio-button-on-outline", gesture: "Tippen", effect: "Klicken (dort, wo der Zeiger ist)" },
   { icon: "time-outline", gesture: "Lange drücken", effect: "Rechtsklick" },
   { icon: "swap-vertical-outline", gesture: "2 Finger", effect: "Scrollen" }
 ];
@@ -2436,7 +2442,7 @@ var BODY = `
 
     <section class="card">
       <h2>Hover testen</h2>
-      <p class="sub">Schalte den Trackpad-Modus ein und bewege den Cursor über das Menü.</p>
+      <p class="sub">Tippe unten auf „Maus“ und bewege den Zeiger über das Menü.</p>
       <nav class="menu">
         <div class="menu-btn">☰ Fahre mit der Maus hierüber ▾</div>
         <div class="menu-list">
@@ -2515,7 +2521,7 @@ var SCRIPT = `
     }
     $('checks').innerHTML = html;
     $('summary').textContent = ok + ' von ' + checks.length + ' Merkmalen wirken wie ein Desktop-Browser' +
-      (ok === checks.length ? ' ✓' : ' – „Desktop-Modus“ in den Einstellungen hilft.');
+      (ok === checks.length ? ' ✓' : ' – „Desktop-Modus“ unter „Mehr“ einschalten.');
   }
   var logLines = [];
   function log(t) {
@@ -2640,12 +2646,11 @@ import {
   View as View11
 } from "react-native";
 import { jsx as jsx14, jsxs as jsxs13 } from "react/jsx-runtime";
-var ACCELERATION = 1.6;
+var ACCELERATION = 1.2;
 var SEND_INTERVAL_MS = 32;
 var TAP_SLOP_PT = 8;
-var TAP_MAX_MS = 250;
 var LONG_PRESS_MS = 500;
-var CURSOR_SIZE = 22;
+var CURSOR_SIZE = 26;
 function cursorIcon(cursor) {
   if (cursor === "pointer") return { name: "hand-pointing-up", hx: 0.42, hy: 0.1 };
   if (cursor === "text" || cursor === "vertical-text") return { name: "cursor-text", hx: 0.5, hy: 0.5 };
@@ -2748,10 +2753,10 @@ function TrackpadOverlay({ geometry, cursor, inject }) {
       onPanResponderGrant: (evt) => {
         gesture.startTime = Date.now();
         gesture.moved = false;
-        gesture.twoFinger = false;
         gesture.longPressFired = false;
         gesture.last = centroid(evt);
         gesture.lastTouchCount = evt.nativeEvent.touches.length;
+        gesture.twoFinger = gesture.lastTouchCount >= 2;
         clearLongPress();
         gesture.longPressTimer = setTimeout(() => {
           gesture.longPressTimer = null;
@@ -2803,7 +2808,7 @@ function TrackpadOverlay({ geometry, cursor, inject }) {
       onPanResponderRelease: () => {
         clearLongPress();
         flush();
-        const isTap = !gesture.twoFinger && !gesture.moved && !gesture.longPressFired && Date.now() - gesture.startTime < TAP_MAX_MS;
+        const isTap = !gesture.twoFinger && !gesture.moved && !gesture.longPressFired && Date.now() - gesture.startTime < LONG_PRESS_MS;
         if (isTap) {
           const { x, y } = pos.current;
           injectRef.current(mouse.click(Math.round(x), Math.round(y)));
@@ -2973,14 +2978,22 @@ var DesktopViewport = forwardRef(function DesktopViewport2({
     }
     lastSize.current = key;
   }, [cssWidth, cssHeight, inject]);
+  const reloadPage = useCallback5(() => {
+    if (nav.current.url === TEST_PAGE_URL) {
+      testNonce.current += 1;
+      setSource(testPageSource(testNonce.current));
+      return;
+    }
+    webRef.current?.reload();
+  }, []);
   const envKey = `${agent.id}|${agent.userAgent}|${desktopMode}`;
   const lastEnv = useRef6(envKey);
   useEffect7(() => {
     if (lastEnv.current === envKey) return;
     lastEnv.current = envKey;
-    const t = setTimeout(() => webRef.current?.reload(), 60);
+    const t = setTimeout(reloadPage, 60);
     return () => clearTimeout(t);
-  }, [envKey]);
+  }, [envKey, reloadPage]);
   const lastMode = useRef6(inputMode);
   useEffect7(() => {
     if (lastMode.current === "mouse" && inputMode !== "mouse") {
@@ -2995,14 +3008,13 @@ var DesktopViewport = forwardRef(function DesktopViewport2({
   }, []);
   const load = useCallback5(
     (url) => {
-      const current = nav.current.url;
-      if (url === current) {
-        webRef.current?.reload();
-        return;
-      }
       if (url === TEST_PAGE_URL) {
         testNonce.current += 1;
         setSource(testPageSource(testNonce.current));
+        return;
+      }
+      if (url === nav.current.url) {
+        webRef.current?.reload();
         return;
       }
       const prev = sourceRef.current;
@@ -3020,7 +3032,7 @@ var DesktopViewport = forwardRef(function DesktopViewport2({
       load,
       goBack: () => webRef.current?.goBack(),
       goForward: () => webRef.current?.goForward(),
-      reload: () => webRef.current?.reload(),
+      reload: reloadPage,
       stop: () => {
         webRef.current?.stopLoading();
         emitNav({ loading: false });
@@ -3047,7 +3059,7 @@ var DesktopViewport = forwardRef(function DesktopViewport2({
         }
       }
     }),
-    [load, emitNav, screenshotInfoBar]
+    [load, emitNav, reloadPage, screenshotInfoBar]
   );
   const handleShouldStart = useCallback5(
     (req) => {
@@ -3130,7 +3142,18 @@ var DesktopViewport = forwardRef(function DesktopViewport2({
     if (msg.type === "cursor") setCursor(msg.cursor || "default");
     cb.current.onPageMessage?.(msg);
   }, []);
-  const handleTerminate = useCallback5(() => webRef.current?.reload(), []);
+  const lastTerminate = useRef6(0);
+  const handleTerminate = useCallback5(() => {
+    const now = Date.now();
+    const repeated = now - lastTerminate.current < 2e4;
+    lastTerminate.current = now;
+    if (repeated) {
+      emitNav({ loading: false });
+      cb.current.onError?.("Die Seite ist abgestürzt (zu wenig Arbeitsspeicher). Wähle eine kleinere Bildschirmgröße.");
+      return;
+    }
+    reloadPage();
+  }, [emitNav, reloadPage]);
   const screenHeight = cssHeight + (infoMeta ? INFO_BAR_HEIGHT : 0);
   return /* @__PURE__ */ jsxs14(View12, { style: styles14.container, onLayout, children: [
     geometry && /* @__PURE__ */ jsxs14(
@@ -3368,12 +3391,14 @@ ${errorText(e)}`);
     setIntroOpen(false);
     if (!settings.onboardingDone) updateSettings({ onboardingDone: true });
   }, [settings.onboardingDone, updateSettings]);
-  const showIntro = useCallback6(() => setIntroOpen(true), []);
+  const showIntro = useCallback6(() => {
+    setTimeout(() => setIntroOpen(true), 600);
+  }, []);
   const closeSheet = useCallback6(() => setSheet(null), []);
   const openResolution = useCallback6(() => setSheet("resolution"), []);
   const openSettings = useCallback6(() => setSheet("settings"), []);
   const openBookmarks = useCallback6(() => setSheet("bookmarks"), []);
-  const sizeText = geometry ? `${formatResolution({ width: geometry.cssWidth, height: geometry.cssHeight })} · ${formatScale(geometry.scale)}` : formatResolution(resolution);
+  const sizeText = geometry ? scaleMode === "fill" ? `${geometry.cssWidth} px breit · ${formatScale(geometry.scale)}` : `${formatResolution({ width: geometry.cssWidth, height: geometry.cssHeight })} · ${formatScale(geometry.scale)}` : formatResolution(resolution);
   return /* @__PURE__ */ jsxs15(
     View13,
     {

@@ -12,12 +12,11 @@ import {
 import { mouse } from '../core/injected';
 import type { ViewportGeometry } from '../types';
 
-const ACCELERATION = 1.6;
+const ACCELERATION = 1.2;
 const SEND_INTERVAL_MS = 32;
 const TAP_SLOP_PT = 8;
-const TAP_MAX_MS = 250;
 const LONG_PRESS_MS = 500;
-const CURSOR_SIZE = 22;
+const CURSOR_SIZE = 26;
 
 type IconName = 'cursor-default' | 'hand-pointing-up' | 'cursor-text';
 
@@ -156,10 +155,11 @@ export function TrackpadOverlay({ geometry, cursor, inject }: TrackpadOverlayPro
         onPanResponderGrant: (evt: GestureResponderEvent) => {
           gesture.startTime = Date.now();
           gesture.moved = false;
-          gesture.twoFinger = false;
           gesture.longPressFired = false;
           gesture.last = centroid(evt);
           gesture.lastTouchCount = evt.nativeEvent.touches.length;
+          // Both fingers can land in the same event: then it is a scroll, never a tap/long press.
+          gesture.twoFinger = gesture.lastTouchCount >= 2;
           clearLongPress();
           gesture.longPressTimer = setTimeout(() => {
             gesture.longPressTimer = null;
@@ -216,7 +216,7 @@ export function TrackpadOverlay({ geometry, cursor, inject }: TrackpadOverlayPro
             !gesture.twoFinger &&
             !gesture.moved &&
             !gesture.longPressFired &&
-            Date.now() - gesture.startTime < TAP_MAX_MS;
+            Date.now() - gesture.startTime < LONG_PRESS_MS;
           if (isTap) {
             const { x, y } = pos.current;
             injectRef.current(mouse.click(Math.round(x), Math.round(y)));

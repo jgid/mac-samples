@@ -6,7 +6,7 @@ type IconName = keyof typeof Ionicons.glyphMap;
 
 const GESTURES: { icon: IconName; gesture: string; effect: string }[] = [
   { icon: 'finger-print-outline', gesture: '1 Finger bewegen', effect: 'Maus bewegen' },
-  { icon: 'radio-button-on-outline', gesture: 'Tippen', effect: 'Klicken' },
+  { icon: 'radio-button-on-outline', gesture: 'Tippen', effect: 'Klicken (dort, wo der Zeiger ist)' },
   { icon: 'time-outline', gesture: 'Lange drücken', effect: 'Rechtsklick' },
   { icon: 'swap-vertical-outline', gesture: '2 Finger', effect: 'Scrollen' },
 ];
